@@ -132,6 +132,18 @@ struct RobotModelPinocchio : torch::CustomClassHolder {
     return result;
   }
 
+  torch::Tensor compute_inertia(torch::Tensor joint_positions) {
+    int nq = pinocchio_wrapper::get_nq(pinocchio_state_);
+    joint_positions = validTensor(joint_positions);
+
+    auto M = pinocchio_wrapper::compute_inertia(
+          pinocchio_state_,
+          matrixToVector(dtt::libtorch2eigen<double>(joint_positions)));
+    M.triangularView<Eigen::StrictlyLower>() = M.transpose().triangularView<Eigen::StrictlyLower>();
+    std::vector<int64_t> dims = {nq, nq};
+    return torch::from_blob(M.data(), dims, torch::kFloat64).clone();
+  }
+
   torch::Tensor inverse_dynamics(torch::Tensor joint_positions,
                                  torch::Tensor joint_velocities,
                                  torch::Tensor joint_accelerations) {
@@ -191,6 +203,7 @@ TORCH_LIBRARY(torchscript_pinocchio, m) {
            &RobotModelPinocchio::get_joint_velocity_limits)
       .def("forward_kinematics", &RobotModelPinocchio::forward_kinematics)
       .def("compute_jacobian", &RobotModelPinocchio::compute_jacobian)
+      .def("compute_inertia", &RobotModelPinocchio::compute_inertia)
       .def("inverse_dynamics", &RobotModelPinocchio::inverse_dynamics)
       .def("inverse_kinematics", &RobotModelPinocchio::inverse_kinematics)
       .def("get_link_idx_from_name",
