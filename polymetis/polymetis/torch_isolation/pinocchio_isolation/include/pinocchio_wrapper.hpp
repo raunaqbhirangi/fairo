@@ -36,7 +36,16 @@ compute_jacobian(State *state, const Eigen::VectorXd &joint_positions,
                                           Eigen::Dynamic, Eigen::RowMajor>> &J,
                  int64_t frame_idx);
 
+C_TORCH_EXPORT void compute_jacobian_mat(
+    State *state, const Eigen::VectorXd &joint_positions,
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                             Eigen::RowMajor> &J,
+    int64_t frame_idx);
+
 C_TORCH_EXPORT Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> compute_inertia(
+                State *state, const Eigen::VectorXd &joint_positions);
+
+C_TORCH_EXPORT Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> compute_Minv(
                 State *state, const Eigen::VectorXd &joint_positions);
 
 C_TORCH_EXPORT Eigen::Matrix<double, Eigen::Dynamic, 1>
