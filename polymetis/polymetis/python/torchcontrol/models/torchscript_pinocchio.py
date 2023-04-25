@@ -125,6 +125,20 @@ class RobotModelPinocchio(torch.nn.Module):
         return self.model.compute_jacobian(joint_positions, frame_idx).to(
             joint_positions
         )
+    
+    def compute_inertia(
+        self, joint_positions: torch.Tensor
+    ) -> torch.Tensor:
+        """Computes the joint space inertia matrix
+
+        Args:
+            joint_positions: A given set of joint angles.
+        
+        Returns:
+            torch.Tensor: The joint space inertia matrix
+        
+        """
+        return self.model.compute_inertia(joint_positions).to(joint_positions)
 
     def inverse_dynamics(
         self,
